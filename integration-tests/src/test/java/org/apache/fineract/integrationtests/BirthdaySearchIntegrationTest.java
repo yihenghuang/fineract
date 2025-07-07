@@ -19,14 +19,16 @@
 package org.apache.fineract.integrationtests;
 
 import static org.apache.fineract.integrationtests.common.savings.SavingsAccountHelper.CREATED_DATE_MINUS_ONE;
-import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import io.restassured.builder.RequestSpecBuilder;
 import io.restassured.builder.ResponseSpecBuilder;
 import io.restassured.http.ContentType;
 import io.restassured.specification.RequestSpecification;
 import io.restassured.specification.ResponseSpecification;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
+import java.util.stream.Stream;
 import org.apache.fineract.integrationtests.common.ClientHelper;
 import org.apache.fineract.integrationtests.common.Utils;
 import org.apache.fineract.integrationtests.common.savings.SavingsAccountHelper;
@@ -34,11 +36,13 @@ import org.apache.fineract.integrationtests.common.savings.SavingsProductHelper;
 import org.apache.fineract.integrationtests.common.savings.SavingsStatusChecker;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@SuppressWarnings({ "rawtypes" })
+@SuppressWarnings({ "rawtypes", "unchecked" })
 public class BirthdaySearchIntegrationTest {
 
     private static final Logger LOG = LoggerFactory.getLogger(BirthdaySearchIntegrationTest.class);
@@ -58,42 +62,38 @@ public class BirthdaySearchIntegrationTest {
         this.responseSpec = new ResponseSpecBuilder().expectStatusCode(200).build();
     }
 
-    @Test
-    public void testSearchByBirthday() {
+    private static Stream<Arguments> provideBirthDates() {
+        return Stream.of(Arguments.of(Arrays.asList("02 January 1995", "02 January 1995", "02 February 1996"), "1995-01-02", 2));
+    }
+
+    @ParameterizedTest
+    @MethodSource("provideBirthDates")
+    public void testSearchByBirthday(List<String> birthDates, String searchDate, int expectedResult) {
         this.savingsAccountHelper = new SavingsAccountHelper(this.requestSpec, this.responseSpec);
+
         final Integer savingsProductID = createSavingsProduct(this.requestSpec, this.responseSpec, MINIMUM_OPENING_BALANCE);
         Assertions.assertNotNull(savingsProductID);
 
-        // Create first client with birthday 01 January 1995
-        createClientAndSavingsAccount("01 January 1995", savingsProductID);
+        for (String birthDate : birthDates) {
+            final Integer clientID = ClientHelper.createClientWithBirthDate(this.requestSpec, this.responseSpec,
+                    CREATED_DATE_MINUS_ONE, birthDate);
+            ClientHelper.verifyClientCreatedOnServer(this.requestSpec, this.responseSpec, clientID);
 
-        // Create second client with birthday 01 January 1995
-        createClientAndSavingsAccount("01 January 1995", savingsProductID);
+            final Integer savingsId = this.savingsAccountHelper.applyForSavingsApplication(clientID, savingsProductID,
+                    ACCOUNT_TYPE_INDIVIDUAL);
+            Assertions.assertNotNull(savingsId);
 
-        // Create third client with birthday 02 February 1996
-        createClientAndSavingsAccount("02 February 1996", savingsProductID);
+            HashMap savingsStatusHashMap = this.savingsAccountHelper.approveSavings(savingsId);
+            SavingsStatusChecker.verifySavingsIsApproved(savingsStatusHashMap);
 
-        final String urlBirthDate = "1995-01-01"; // ISO format for the birth date
-        final HashMap<String, Object> savingsAccounts = this.savingsAccountHelper.getSavingsAccounts(urlBirthDate);
+            savingsStatusHashMap = this.savingsAccountHelper.activateSavings(savingsId);
+            SavingsStatusChecker.verifySavingsIsActive(savingsStatusHashMap);
+        }
+
+        final HashMap<String, Object> savingsAccounts = this.savingsAccountHelper.getSavingsAccounts(searchDate);
         LOG.info("---------------------------------SAVINGS ACCOUNTS-------------------------------------" + savingsAccounts);
         Assertions.assertNotNull(savingsAccounts);
-        Assertions.assertEquals(2, savingsAccounts.get("totalFilteredRecords"));
-    }
-
-    private void createClientAndSavingsAccount(final String birthDate, final Integer savingsProductID) {
-        final Integer clientID = ClientHelper.createClientWithBirthDate(this.requestSpec, this.responseSpec, CREATED_DATE_MINUS_ONE,
-                birthDate);
-        ClientHelper.verifyClientCreatedOnServer(this.requestSpec, this.responseSpec, clientID);
-
-        final Integer savingsId = this.savingsAccountHelper.applyForSavingsApplication(clientID, savingsProductID,
-                ACCOUNT_TYPE_INDIVIDUAL);
-        Assertions.assertNotNull(savingsId);
-
-        HashMap savingsStatusHashMap = this.savingsAccountHelper.approveSavings(savingsId);
-        SavingsStatusChecker.verifySavingsIsApproved(savingsStatusHashMap);
-
-        savingsStatusHashMap = this.savingsAccountHelper.activateSavings(savingsId);
-        SavingsStatusChecker.verifySavingsIsActive(savingsStatusHashMap);
+        Assertions.assertEquals(expectedResult, savingsAccounts.get("totalFilteredRecords"));
     }
 
     private Integer createSavingsProduct(final RequestSpecification requestSpec, final ResponseSpecification responseSpec,
