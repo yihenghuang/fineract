@@ -62,15 +62,15 @@ public class BirthdaySearchIntegrationTest {
     public void testSearchByBirthday() {
         this.savingsAccountHelper = new SavingsAccountHelper(this.requestSpec, this.responseSpec);
 
-        final String birthDate = "1990-01-01";
-        final Integer clientID = ClientHelper.createClient(this.requestSpec, this.responseSpec, CREATED_DATE_MINUS_ONE);
+        final String birthDate = "01 January 1995";
+        final Integer clientID = ClientHelper.createClientWithBirthDate(this.requestSpec, this.responseSpec, CREATED_DATE_MINUS_ONE, birthDate);
         ClientHelper.verifyClientCreatedOnServer(this.requestSpec, this.responseSpec, clientID);
 
         final Integer savingsProductID = createSavingsProduct(this.requestSpec, this.responseSpec, MINIMUM_OPENING_BALANCE);
         Assertions.assertNotNull(savingsProductID);
 
         final Integer savingsId = this.savingsAccountHelper.applyForSavingsApplication(clientID, savingsProductID, ACCOUNT_TYPE_INDIVIDUAL);
-        Assertions.assertNotNull(savingsProductID);
+        Assertions.assertNotNull(savingsId);
 
         HashMap savingsStatusHashMap = this.savingsAccountHelper.approveSavings(savingsId);
         SavingsStatusChecker.verifySavingsIsApproved(savingsStatusHashMap);
@@ -78,7 +78,8 @@ public class BirthdaySearchIntegrationTest {
         savingsStatusHashMap = this.savingsAccountHelper.activateSavings(savingsId);
         SavingsStatusChecker.verifySavingsIsActive(savingsStatusHashMap);
 
-        final HashMap<String, Object> savingsAccounts = this.savingsAccountHelper.getSavingsAccounts(birthDate);
+        final String urlBirthDate = "1995-01-01"; // ISO format for the birth date
+        final HashMap<String, Object> savingsAccounts = this.savingsAccountHelper.getSavingsAccounts(urlBirthDate);
         LOG.info("---------------------------------SAVINGS ACCOUNTS-------------------------------------" + savingsAccounts);
         Assertions.assertNotNull(savingsAccounts);
         Assertions.assertEquals(1, savingsAccounts.get("totalFilteredRecords"));
