@@ -182,6 +182,17 @@ public final class SearchParameters {
         return new SearchParameters(provisioningEntryId, officeId, productId, categoryId, offset, limit);
     }
 
+    /**
+     * Factory method for creating an instance of the SearchParameters for savings accounts.
+     * @param sqlSearch
+     * @param externalId
+     * @param offset
+     * @param limit
+     * @param orderBy
+     * @param sortOrder
+     * @param birthDate
+     * @return
+     */
     public static SearchParameters forSavings(final String sqlSearch, final String externalId, final Integer offset, final Integer limit,
             final String orderBy, final String sortOrder, final String birthDate) {
 
@@ -244,6 +255,11 @@ public final class SearchParameters {
                 staffId, accountNo, loanId, savingsId, orphansOnly, isSelfUser);
     }
 
+    /**
+     * Note for reviewers: A builder pattern might be best to improve the non-extendable constructor with many params.
+     * Or breaking it down into smaller objects.
+     * This is a quick solution without a big refactoring into builder pattern.
+     */
     private SearchParameters(final String sqlSearch, final Long officeId, final String externalId, final String name,
             final String hierarchy, final String firstname, final String lastname, final Integer offset, final Integer limit,
             final String orderBy, final String sortOrder, final Long staffId, final String accountNo, final Long loanId,

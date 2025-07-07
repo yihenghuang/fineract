@@ -30,10 +30,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Stream;
 import org.apache.fineract.integrationtests.common.ClientHelper;
+import org.apache.fineract.integrationtests.common.GlobalConfigurationHelper;
 import org.apache.fineract.integrationtests.common.Utils;
 import org.apache.fineract.integrationtests.common.savings.SavingsAccountHelper;
 import org.apache.fineract.integrationtests.common.savings.SavingsProductHelper;
 import org.apache.fineract.integrationtests.common.savings.SavingsStatusChecker;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -63,7 +65,7 @@ public class BirthdaySearchIntegrationTest {
     }
 
     private static Stream<Arguments> provideBirthDates() {
-        return Stream.of(Arguments.of(Arrays.asList("02 January 1995", "02 January 1995", "02 February 1996"), "1995-01-02", 2));
+        return Stream.of(Arguments.of(Arrays.asList("01 January 2000", "01 January 2000", "01 February 2000"), "2000-01-01", 2));
     }
 
     @ParameterizedTest
@@ -91,7 +93,7 @@ public class BirthdaySearchIntegrationTest {
         }
 
         final HashMap<String, Object> savingsAccounts = this.savingsAccountHelper.getSavingsAccounts(searchDate);
-        LOG.info("---------------------------------SAVINGS ACCOUNTS-------------------------------------" + savingsAccounts);
+        LOG.info("---------------------------------SAVINGS ACCOUNTS-------------------------------------");
         Assertions.assertNotNull(savingsAccounts);
         Assertions.assertEquals(expectedResult, savingsAccounts.get("totalFilteredRecords"));
     }
@@ -103,5 +105,11 @@ public class BirthdaySearchIntegrationTest {
                 .withInterestPostingPeriodTypeAsMonthly().withInterestCalculationPeriodTypeAsDailyBalance()
                 .withMinimumOpenningBalance(minOpenningBalance).build();
         return SavingsProductHelper.createSavingsProduct(savingsProductJSON, requestSpec, responseSpec);
+    }
+
+    @AfterEach
+    public void tearDown() {
+        GlobalConfigurationHelper.resetAllDefaultGlobalConfigurations(this.requestSpec, this.responseSpec);
+        GlobalConfigurationHelper.verifyAllDefaultGlobalConfigurations(this.requestSpec, this.responseSpec);
     }
 }

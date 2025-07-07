@@ -178,6 +178,11 @@ public class SavingsAccountReadPlatformServiceImpl implements SavingsAccountRead
         return this.jdbcTemplate.query(sqlBuilder.toString(), this.savingAccountMapper, queryParameters);
     }
 
+    /**
+     * Retrieve all savings accounts for a given search criteria
+     * @param searchParameters
+     * @return
+     */
     @Override
     public Page<SavingsAccountData> retrieveAll(final SearchParameters searchParameters) {
 
