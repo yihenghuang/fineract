@@ -18,6 +18,7 @@
  */
 package org.apache.fineract.integrationtests;
 
+import static org.apache.fineract.integrationtests.common.savings.SavingsAccountHelper.CREATED_DATE_MINUS_ONE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import io.restassured.builder.RequestSpecBuilder;
@@ -62,7 +63,7 @@ public class BirthdaySearchIntegrationTest {
         this.savingsAccountHelper = new SavingsAccountHelper(this.requestSpec, this.responseSpec);
 
         final String birthDate = "1990-01-01";
-        final Integer clientID = ClientHelper.createClient(this.requestSpec, this.responseSpec, "01 January 1990");
+        final Integer clientID = ClientHelper.createClient(this.requestSpec, this.responseSpec, CREATED_DATE_MINUS_ONE);
         ClientHelper.verifyClientCreatedOnServer(this.requestSpec, this.responseSpec, clientID);
 
         final Integer savingsProductID = createSavingsProduct(this.requestSpec, this.responseSpec, MINIMUM_OPENING_BALANCE);
@@ -85,7 +86,7 @@ public class BirthdaySearchIntegrationTest {
     }
 
     private Integer createSavingsProduct(final RequestSpecification requestSpec, final ResponseSpecification responseSpec,
-            final String minOpenningBalance) {
+                                         final String minOpenningBalance) {
         LOG.info("------------------------------CREATING NEW SAVINGS PRODUCT ---------------------------------------");
         final String savingsProductJSON = new SavingsProductHelper().withInterestCompoundingPeriodTypeAsDaily()
                 .withInterestPostingPeriodTypeAsMonthly().withInterestCalculationPeriodTypeAsDailyBalance()
