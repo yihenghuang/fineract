@@ -630,8 +630,8 @@ public class SavingsAccountHelper {
         return response;
     }
 
-    public HashMap<String, Object> getSavingsAccounts(final String birthDate) {
-        final String URL = SAVINGS_ACCOUNT_URL + "?birthDate=" + birthDate + "&" + Utils.TENANT_IDENTIFIER;
+    public HashMap<String, Object> getSavingsAccounts(final String birthMonthDay) {
+        final String URL = SAVINGS_ACCOUNT_URL + "?birthMonthDay=" + birthMonthDay + "&" + Utils.TENANT_IDENTIFIER;
         return Utils.performServerGet(requestSpec, responseSpec, URL, "");
     }
 

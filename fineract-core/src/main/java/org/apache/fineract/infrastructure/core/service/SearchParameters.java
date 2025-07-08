@@ -36,7 +36,7 @@ public final class SearchParameters {
     private final String sortOrder;
     private final String accountNo;
     private final String currencyCode;
-    private final String birthDate;
+    private final String birthMonthDay;
 
     private final Long staffId;
 
@@ -190,11 +190,11 @@ public final class SearchParameters {
      * @param limit
      * @param orderBy
      * @param sortOrder
-     * @param birthDate
+     * @param birthMonthDay
      * @return
      */
     public static SearchParameters forSavings(final String sqlSearch, final String externalId, final Integer offset, final Integer limit,
-            final String orderBy, final String sortOrder, final String birthDate) {
+            final String orderBy, final String sortOrder, final String birthMonthDay) {
 
         final Integer maxLimitAllowed = getCheckedLimit(limit);
         final Long staffId = null;
@@ -205,7 +205,7 @@ public final class SearchParameters {
         final boolean isSelfUser = false;
 
         return new SearchParameters(sqlSearch, null, externalId, null, null, null, null, offset, maxLimitAllowed, orderBy, sortOrder,
-                staffId, accountNo, loanId, savingsId, orphansOnly, isSelfUser, birthDate);
+                staffId, accountNo, loanId, savingsId, orphansOnly, isSelfUser, birthMonthDay);
     }
 
     public static SearchParameters forAccountTransfer(final String sqlSearch, final String externalId, final Integer offset,
@@ -271,7 +271,7 @@ public final class SearchParameters {
     private SearchParameters(final String sqlSearch, final Long officeId, final String externalId, final String name,
             final String hierarchy, final String firstname, final String lastname, final Integer offset, final Integer limit,
             final String orderBy, final String sortOrder, final Long staffId, final String accountNo, final Long loanId,
-            final Long savingsId, final Boolean orphansOnly, boolean isSelfUser, final String birthDate) {
+            final Long savingsId, final Boolean orphansOnly, boolean isSelfUser, final String birthMonthDay) {
         this.sqlSearch = sqlSearch;
         this.officeId = officeId;
         this.externalId = externalId;
@@ -294,7 +294,7 @@ public final class SearchParameters {
         this.categoryId = null;
         this.isSelfUser = isSelfUser;
         this.status = null;
-        this.birthDate = birthDate;
+        this.birthMonthDay = birthMonthDay;
     }
 
     private SearchParameters(final String sqlSearch, final Long officeId, final String externalId, final String name,
@@ -323,7 +323,7 @@ public final class SearchParameters {
         this.categoryId = null;
         this.isSelfUser = isSelfUser;
         this.status = status;
-        this.birthDate = null;
+        this.birthMonthDay = null;
     }
 
     private SearchParameters(final Long officeId, final String externalId, final String name, final String hierarchy,
@@ -352,7 +352,7 @@ public final class SearchParameters {
         this.categoryId = null;
         this.isSelfUser = isSelfUser;
         this.status = null;
-        this.birthDate = null;
+        this.birthMonthDay = null;
     }
 
     private SearchParameters(final Long provisioningEntryId, final Long officeId, final Long productId, final Long categoryId,
@@ -379,7 +379,7 @@ public final class SearchParameters {
         this.categoryId = categoryId;
         this.isSelfUser = false;
         this.status = null;
-        this.birthDate = null;
+        this.birthMonthDay = null;
     }
 
     public SearchParameters(final String sqlSearch, final Long officeId, final String externalId, final String name, final String hierarchy,
@@ -408,7 +408,7 @@ public final class SearchParameters {
         this.categoryId = null;
         this.isSelfUser = false;
         this.status = null;
-        this.birthDate = null;
+        this.birthMonthDay = null;
     }
 
     public boolean isOrderByRequested() {
@@ -570,8 +570,8 @@ public final class SearchParameters {
         return this.isSelfUser;
     }
 
-    public String getBirthDate() {
-        return this.birthDate;
+    public String getBirthMonthDay() {
+        return this.birthMonthDay;
     }
 
     /**

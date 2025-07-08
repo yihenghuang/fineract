@@ -211,12 +211,12 @@ public class SavingsAccountReadPlatformServiceImpl implements SavingsAccountRead
                 paramList.add(searchParameters.getExternalId());
             }
             if (searchParameters.getOfficeId() != null) {
-                sqlBuilder.append("and c.office_id =?");
+                sqlBuilder.append(" and c.office_id = ?");
                 paramList.add(searchParameters.getOfficeId());
             }
-            if (StringUtils.isNotBlank(searchParameters.getBirthDate())) {
-                sqlBuilder.append("and c.date_of_birth = ?");
-                paramList.add(searchParameters.getBirthDate());
+            if (StringUtils.isNotBlank(searchParameters.getBirthMonthDay())) {
+                sqlBuilder.append(" and date_format(c.date_of_birth, '%m-%d') = ?");
+                paramList.add(searchParameters.getBirthMonthDay());
             }
             if (searchParameters.isOrderByRequested()) {
                 sqlBuilder.append(" order by ").append(searchParameters.getOrderBy());

@@ -65,12 +65,12 @@ public class BirthdaySearchIntegrationTest {
     }
 
     private static Stream<Arguments> provideBirthDates() {
-        return Stream.of(Arguments.of(Arrays.asList("01 January 2000", "01 January 2000", "01 February 2000"), "2000-01-01", 2));
+        return Stream.of(Arguments.of(Arrays.asList("01 January 2000", "01 January 2001", "01 February 2000"), "01-01", 2));
     }
 
     @ParameterizedTest
     @MethodSource("provideBirthDates")
-    public void testSearchByBirthday(List<String> birthDates, String searchDate, int expectedResult) {
+    public void testSearchByBirthMonthDay(List<String> birthDates, String searchMonthDay, int expectedResult) {
         this.savingsAccountHelper = new SavingsAccountHelper(this.requestSpec, this.responseSpec);
 
         final Integer savingsProductID = createSavingsProduct(this.requestSpec, this.responseSpec, MINIMUM_OPENING_BALANCE);
@@ -92,7 +92,7 @@ public class BirthdaySearchIntegrationTest {
             SavingsStatusChecker.verifySavingsIsActive(savingsStatusHashMap);
         }
 
-        final HashMap<String, Object> savingsAccounts = this.savingsAccountHelper.getSavingsAccounts(searchDate);
+        final HashMap<String, Object> savingsAccounts = this.savingsAccountHelper.getSavingsAccounts(searchMonthDay);
         LOG.info("---------------------------------SAVINGS ACCOUNTS-------------------------------------");
         Assertions.assertNotNull(savingsAccounts);
         Assertions.assertEquals(expectedResult, savingsAccounts.get("totalFilteredRecords"));
